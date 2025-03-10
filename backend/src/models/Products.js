@@ -31,4 +31,9 @@ const productsSchema = new Schema({
         require: true,
         min: 0
     }
+},{
+    timestamps: true,
+    strict: false
 })
+
+export default model("Products", productsSchema)
