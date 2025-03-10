@@ -2,6 +2,7 @@
 import app from "./app.js";
 import "./database.js";
 
+//PASO 2
 //Crear una función que se encargue de ejecutar el servidor 
 async function main() {
     const port = 4000;
