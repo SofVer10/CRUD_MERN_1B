@@ -14,6 +14,9 @@ const router = express.Router();
 router.route("/")
 .get(productsController.getProducts)
 .post(productsController.insertProducts)
+
+//Actualizar y eliminar utilizan id por eso la ruta es diferente
+router.route("/:id")
 .put(productsController.updateProducts)
 .delete(productsController.deleteProducts);
 

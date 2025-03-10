@@ -3,7 +3,6 @@
 
 //array de funciones del CRUD
 const productsController = {};
-import { json } from "express/lib/response";
 import productsModel from "../models/Products.js";
 
 //S E L E C T
@@ -25,16 +24,16 @@ productsController.insertProducts = async (req, res) => {
 // U P D A T E 
 productsController.updateProducts = async (req, res) => {
     const {name, description, price, stock} = req.body;
-    const updateProduct = new productsModel.findByIdAndUpdate(
-        req.paramas.id, {name, description, price, stock} , {new : true}
+     await new productsModel.findByIdAndUpdate(
+        req.params.id, {name, description, price, stock}, {new : true}
     );
     res.json({message: "Product updated"});
 }
 
 // D E L E T E
 productsController.deleteProducts = async (req, res) => {
-    await productsModel.findById(req.params.id);
-    res,json({message: "Product deleted"})
+    await productsModel.findByIdAndDelete(req.params.id);
+    res.json({message: "Product deleted"})
 
 }
 
