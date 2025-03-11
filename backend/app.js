@@ -6,6 +6,8 @@ import express from "express";
 //PASO 9 
 // esta linea es para cuando ya se hayan credo los metodos
 import productsRoutes from "./src/routes/products.js"
+import clientsRoutes from "./src/routes/clients.js"
+import employeesRoutes from "./src/routes/employees.js"
 
 //PASO 1 (Continuación)
 //Creo una constante que es igual
@@ -19,6 +21,8 @@ app.use(express.json());
 //PASO 5
 //Definir la ruta
 app.use("/api/products", productsRoutes);
+app.use("/api/clients", clientsRoutes);
+app.use("/api/employees", employeesRoutes);
 
 //exporta la constante para poder usar express en otros lados
 export default app;

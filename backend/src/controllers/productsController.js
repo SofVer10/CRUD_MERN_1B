@@ -24,7 +24,7 @@ productsController.insertProducts = async (req, res) => {
 // U P D A T E 
 productsController.updateProducts = async (req, res) => {
     const {name, description, price, stock} = req.body;
-     await new productsModel.findByIdAndUpdate(
+    const updateProducts = await  productsModel.findByIdAndUpdate(
         req.params.id, {name, description, price, stock}, {new : true}
     );
     res.json({message: "Product updated"});
