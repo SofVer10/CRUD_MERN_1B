@@ -2,11 +2,12 @@
 
 import mongoose from "mongoose";
 
-//Guardo en una especie de constante la dirección de mi base de datos
-const URI = "mongodb://localhost:27017/PepsiDB"
+//se importan las variables desde el archivo config.js
+import {config} from "./src/confing.js"
+
 
 //Conectar la base de datos 
-mongoose.connect(URI)
+mongoose.connect(config.db.URI)
 
 //PASO 4
 

@@ -10,6 +10,8 @@ import clientsRoutes from "./src/routes/clients.js"
 import employeesRoutes from "./src/routes/employees.js"
 import localsRoutes from "./src/routes/locals.js"
 import categoriesRoutes from "./src/routes/categories.js"
+import reviewsRoutes from "./src/routes/reviews.js"
+import evaluationRoutes from "./src/routes/evaluations.js"
 
 //PASO 1 (Continuación)
 //Creo una constante que es igual
@@ -27,6 +29,8 @@ app.use("/api/clients", clientsRoutes);
 app.use("/api/employees", employeesRoutes);
 app.use("/api/locals", localsRoutes);
 app.use("/api/categories", categoriesRoutes);
+app.use("/api/reviews", reviewsRoutes);
+app.use("/api/evaluations", evaluationRoutes);
 
 //exporta la constante para poder usar express en otros lados
 export default app;
