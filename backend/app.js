@@ -13,16 +13,21 @@ import reviewsRoutes from "./src/routes/reviews.js"
 import evaluationRoutes from "./src/routes/evaluations.js"
 import registerEmployeesRoutes from "./src/routes/registerEmployees.js"
 import loginRoutes from "./src/routes/login.js"
+//Importar libreria para que PostMan acepte cookies
+import cookieParser from "cookie-parser";
 
 //PASO 1 (Continuación)
 //Creo una constante que es igual
 //a la libreria que importe y la ejecuta
 const app = express();
 
+
+
 //PASO 10
 //uso un middleware para que acepte datos JSON
 app.use(express.json());
-
+//Que acepte cookies
+app.use(cookieParser());
 //PASO 5
 //Definir la ruta
 app.use("/api/products", productsRoutes);

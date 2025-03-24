@@ -1,8 +1,8 @@
 //Importamos el modelo de la base de datos
-import employeesModel from "../models/Employees";
+import employeesModel from "../models/Employees.js";
 import bcryptjs from "bcryptjs"; //Lib. para encriptar
 import  JsonWebToken  from "jsonwebtoken"; //Lib. para generar token
-import {config} from "../config.js";
+import {config} from "../confing.js";
 
 //crear una array de funciones
 const registerEmployeesController = {};

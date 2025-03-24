@@ -12,8 +12,7 @@ const router = express.Router();
 
 //Se conecta automaticamente a la ruta con solo colocar "/"
 router.route("/")
-.post(employeesController.insertEmployees)
-
+.get(employeesController.getEmployees)
 //Actualizar y eliminar utilizan id por eso la ruta es diferente
 router.route("/:id")
 .put(employeesController.updateEmployees)

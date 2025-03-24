@@ -4,7 +4,7 @@ import CustomersModel from "../models/Clients.js"
 import EmployesModel from "../models/Employees.js"
 import bcryptjs from "bcryptjs"; //Lib. para encriptar
 import  JsonWebToken  from "jsonwebtoken"; //Lib. para generar token
-import {config} from "../config.js";
+import {config} from "../confing.js";
 
 const loginController = {};
 

@@ -1,9 +1,9 @@
 import express from "express";
 import registerEmployeesController from "../controllers/registerEmployeesController.js";
 
-const router = expressRouter();
+const router = express.Router();
 
 router.route("/")
-.post(resgiterEmployeesController.register);
+.post(registerEmployeesController.register);
 
 export default router;
