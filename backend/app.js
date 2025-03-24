@@ -32,6 +32,8 @@ app.use("/api/categories", categoriesRoutes);
 app.use("/api/reviews", reviewsRoutes);
 app.use("/api/evaluations", evaluationRoutes);
 
+app.use("/api/registerEmployees");
+
 //exporta la constante para poder usar express en otros lados
 export default app;
 
