@@ -11,15 +11,8 @@ employeesController.getEmployees = async (req, res) => {
     res.json(employees)
 }
 
-// I N S E R T
-employeesController.insertEmployees = async (req, res) => {
-    //campos que se van a solicitar en el nuevo esquema creado
-    const {name, lastName, birthday, email, password, address, hireDate, telephone, dui, isssNumber, isVerified} = req.body;
-    //datos con los que se va a llenar el esquema que creamos
-    const newEmployees = new employeesModel({name, lastName, birthday, email, password, address, hireDate, telephone, dui, isssNumber, isVerified});
-    await newEmployees.save();
-    res.json({message: "Employees saved"});
-}
+// I N S E R T se hace desde el login
+
 
 // U P D A T E 
 employeesController.updateEmployees = async (req, res) => {
