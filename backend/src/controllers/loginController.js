@@ -45,7 +45,7 @@ loginController.login = async (req, res) => {
 
         //Si no es administrador validamos la contraseña
         if(userType != "Admin"){
-            const isMach = bcryptjs.compare(password, userFound.password);
+            const isMach = await bcryptjs.compare(password, userFound.password);
             if(!isMach){
                 return res.json({message: "Invalid password"})
             }
@@ -62,7 +62,8 @@ loginController.login = async (req, res) => {
             //4. Función flecha (error, token)
             (error, token) => {
                 if(error) console.log(error)
-                res.cookie("authToken", token)
+                res.cookie("authToken", token);
+            res.json({message: "login successful"})
             }
             )
         }
