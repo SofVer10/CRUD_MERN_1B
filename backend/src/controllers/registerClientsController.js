@@ -65,7 +65,7 @@ registerClientsController.register = async (req, res) => {
         //Enviar el correo electronico
         //1. Transporter => Quien lo envía
         const transporter = nodemailer.createTransport({
-            service: "gamil",
+            service: "gmail",
             auth: {
                 user: config.emailClient.email_user,
                 pass: config.emailClient.email_pass
