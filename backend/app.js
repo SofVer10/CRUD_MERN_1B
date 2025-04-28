@@ -17,6 +17,7 @@ import loginRoutes from "./src/routes/login.js"
 import cookieParser from "cookie-parser";
 import logoutRoutes from "./src/routes/logout.js"
 import registerClients from "./src/routes/registerClients.js"
+import passwordRecoveryRoutes from "./src/routes/passwordRecovery.js"
 
 //PASO 1 (Continuación)
 //Creo una constante que es igual
@@ -44,7 +45,8 @@ app.use("/api/registerEmployees", registerEmployeesRoutes);
 app.use("/api/login", loginRoutes);
 app.use("/api/logout", logoutRoutes);
 
-app.use("/api/registerClients", registerClients)
+app.use("/api/registerClients", registerClients);
+app.use("/api/passwordRecoveryRoutes", passwordRecoveryRoutes);
 
 //PASO 1 (Continuación)
 //exporta la constante para poder usar express en otros lados
