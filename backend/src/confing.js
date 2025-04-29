@@ -23,3 +23,4 @@ export const config = {
         email_pass: process.env.EMAIL_PASS
     }
 }
+

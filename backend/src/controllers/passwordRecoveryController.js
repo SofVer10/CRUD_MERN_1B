@@ -4,9 +4,10 @@ import bcrypt from "bcryptjs" //Encriptar contraseña
 import clientsModel from "../models/Clients.js";
 import employeeModel from "../models/Employees.js";
 import { sendEmail, HTMLRecoveryEmail } from "../utils/mailPasswordRecovery.js";
-import { config } from "../config.js";
+import { config } from "../confing.js";
 import { verify } from "crypto";
  
+
  
 //1- Crear un array de funciones
 const passwordRecoveryController= {};
@@ -32,7 +33,7 @@ if(!userFound){
    
 //Generar un código de 6 digitos
  
-const code = Math.floor(10000 + Math.random() * 60000).toString
+const code = Math.floor(10000 + Math.random() * 60000).toString()
  
 //generar un token
 const token = jsonwebToken.sign(
@@ -75,7 +76,7 @@ passwordRecoveryController.verifyCode = async (req, res) => {
 
     try {
         //Obtener el token que esta guardado en cookie
-        const token = req.cookie.tokenRecoveryCode;
+        const token = req.cookies.tokenRecoveryCode;
 
         //Extraer todos los datos del token
         const decoded = jsonwebToken.verify(token, config.JWT.secret)
@@ -88,7 +89,7 @@ passwordRecoveryController.verifyCode = async (req, res) => {
         //Marcamos el token como verificado (si es correcto)
         const newToken = jsonwebToken.sign(
             //1. ¿Qué vamos a guardar?
-            {email: decode.email, code: decoded.code, usserType: decoded.userType, verified: true},
+            {email: decoded.email, code: decoded.code, usserType: decoded.userType, verified: true},
 
             //2. secrect key
             config.JWT.secret,
@@ -107,5 +108,52 @@ passwordRecoveryController.verifyCode = async (req, res) => {
         console.log("error" + error)
     }
 };
+
+//Actualizar nueva contraseña
+passwordRecoveryController.newPassword = async(req, res) => {
+    const {newPassword} = req.body;
+
+    try {
+        //Acceder al token que está en las cookies
+        const token =req.cookies.tokenRecoveryCode
+
+        //Decodificar el token
+        const decoded = jsonwebToken.verify(token, config.JWT.secret)
+
+        if(!decoded.verified){
+            return res.json({message: "Code not verified"});
+        }
+
+        let user;
+        const {email} = decoded;
+
+        //Encriptar contraseña
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+
+        //Guardamos la nueva contraseña en la base de datos
+        if(decoded.userType === "client"){
+            user = await clientsModel.findByIdAndUpdate(
+                {email},
+                {password: hashedPassword},
+                {new: true}
+            )
+        }else if (decoded.userType === "employee")(
+            {email},
+            {password: hashedPassword},
+            {new: true}
+        )
+
+        res.clearCookie("tokenRecoveryCode")
+        res.json({ message: "Password updated"});
+
+
+    
+        
+        
+    } catch (error) {
+        console.log("Error " + error)
+    }
+}
 
 export default passwordRecoveryController;

@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer"; //Enviar correos
-import {config} from "../config.js"
+import {config} from "../confing.js"
  
 // 1- Configurar el transporter => ¿Quién envia el correo?
  
@@ -9,8 +9,8 @@ const transporter = nodemailer.createTransport({
     secure: true,
  
     auth: {
-        user: config.userEmail.email_user,
-        pass: config.userEmail.password_user
+        user: config.emailClient.email_user,
+        pass: config.emailClient.email_pass
     }
 })
  
@@ -19,7 +19,7 @@ const sendEmail = async (to, subject, text, html) => {
  
     try {
         const info = await transporter.sendMail({
-            from: '"Coca Cola" <aaron.edgardo.garcia@gmail.com>',
+            from: '"Pepsi" <verosofpalacioss@gmail.com>',
             to,
             subject,
             text,
@@ -55,3 +55,5 @@ const HTMLRecoveryEmail = (code) => {
       </div>
     `;
   };
+
+  export {sendEmail, HTMLRecoveryEmail};
