@@ -20,6 +20,8 @@ import registerClients from "./src/routes/registerClients.js"
 import passwordRecoveryRoutes from "./src/routes/passwordRecovery.js"
 import blogRoute from "./src/routes/blog.js"
 
+import { validateAuthToken } from "./src/middlewares/validateAuthToken.js";
+
 //PASO 1 (Continuación)
 //Creo una constante que es igual
 //a la libreria que importe y la ejecuta
@@ -36,7 +38,9 @@ app.use(cookieParser());
 //Definir la ruta
 app.use("/api/products", productsRoutes);
 app.use("/api/clients", clientsRoutes);
-app.use("/api/employees", employeesRoutes);
+//El middleware tiene que estar en el centro porque tiene que ejecutar antes de employeesRoutes en este caso
+//los nombres se colocan de la misma manera que se escribieron en userType del Login sino no va a funcionar
+app.use("/api/employees", validateAuthToken(["Employee", "Admin"]), employeesRoutes);
 app.use("/api/locals", localsRoutes);
 app.use("/api/categories", categoriesRoutes);
 app.use("/api/reviews", reviewsRoutes);
