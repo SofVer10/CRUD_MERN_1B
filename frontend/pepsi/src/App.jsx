@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import './App.css'
 import Nav from "./components/Nav"
 import Home from "./pages/Home"
-import Agregarcliente from "./pages/client"
+import AgregarCliente from "./pages/client"
 import AgregarLocal from "./pages/locals"
 import AgregarProducto from "./pages/products"
 
@@ -17,7 +17,7 @@ function App() {
         <Nav/>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/clients" element={<Agregarcliente />} />
+          <Route path="/clients" element={<AgregarCliente />} />
           <Route path="/locals" element={<AgregarLocal />} />
           <Route path="/products" element={<AgregarProducto />} />
         </Routes>
