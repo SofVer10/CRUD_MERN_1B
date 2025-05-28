@@ -1,0 +1,99 @@
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: linear-gradient(135deg, rgba(139, 69, 193, 0.15) 0%, rgba(236, 72, 153, 0.1) 50%, rgba(251, 146, 60, 0.1) 100%);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    align-items: center;
+    justify-items: center;
+  }
+  
+  .nav-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1a202c;
+    text-decoration: none;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+    justify-self: start;
+  }
+  
+  .nav-menu {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    justify-self: center;
+  }
+  
+  .nav-link {
+    color: #2d3748;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    position: relative;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+  }
+  
+  .nav-link:hover {
+    color: #1a202c;
+  }
+  
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 50%;
+    background-color: #1a202c;
+    transition: all 0.3s ease;
+  }
+  
+  .nav-link:hover::after {
+    width: 100%;
+    left: 0;
+  }
+  
+  .nav-register {
+    color: #2d3748;
+    text-decoration: none;
+    padding: 0.5rem 1.5rem;
+    border: 2px solid rgba(45, 55, 72, 0.8);
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+    justify-self: end;
+  }
+  
+  .nav-register:hover {
+    background-color: #2d3748;
+    color: white;
+  }
+  
+  @media (max-width: 768px) {
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 1rem;
+    }
+    
+    .nav-menu {
+      display: none;
+    }
+  }
