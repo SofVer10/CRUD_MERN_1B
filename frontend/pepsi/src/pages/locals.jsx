@@ -1,14 +1,21 @@
 import { useState } from 'react';
-import { MapPin, Phone, Clock, Building, Store, Plus, Trash2, Navigation } from 'lucide-react';
+import { MapPin, Phone, Clock, Building, Store, Plus, Trash2, Navigation, Edit3, X, Save } from 'lucide-react';
+import useLocals from '../hooks/useLocals'; // Importa el hook personalizado
 
 export default function AgregarLocal() {
-  const [locals, setLocals] = useState([]);
+  // Usar el hook personalizado en lugar de useState local
+  const { locals, loading, error, createLocal, deleteLocal, updateLocal } = useLocals();
+  
   const [formData, setFormData] = useState({
     name: '',
     address: '',
     telephone: '',
     schedule: ''
   });
+
+  // Estados para el modo de edición
+  const [editingLocal, setEditingLocal] = useState(null); // ID del local que se está editando
+  const [isEditMode, setIsEditMode] = useState(false); // Si estamos en modo edición
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -18,7 +25,37 @@ export default function AgregarLocal() {
     }));
   };
 
-  const handleSubmit = () => {
+  // Función para cargar datos de un local en el formulario para editar
+  const handleEditLocal = (local) => {
+    setFormData({
+      name: local.name,
+      address: local.address,
+      telephone: local.telephone.toString(),
+      schedule: local.schedule || ''
+    });
+    setEditingLocal(local._id);
+    setIsEditMode(true);
+    
+    // Hacer scroll hacia el formulario
+    const formElement = document.querySelector('#form-section');
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  // Función para cancelar la edición
+  const handleCancelEdit = () => {
+    setFormData({
+      name: '',
+      address: '',
+      telephone: '',
+      schedule: ''
+    });
+    setEditingLocal(null);
+    setIsEditMode(false);
+  };
+
+  const handleSubmit = async () => {
     if (!formData.name || !formData.address || !formData.telephone) {
       alert('Por favor completa todos los campos requeridos (Nombre, Dirección y Teléfono)');
       return;
@@ -30,23 +67,52 @@ export default function AgregarLocal() {
       return;
     }
     
-    const newLocal = {
-      ...formData,
-      telephone: parseInt(formData.telephone),
-      id: Date.now(),
-      createdAt: new Date().toLocaleDateString()
-    };
-    setLocals(prev => [...prev, newLocal]);
-    setFormData({
-      name: '',
-      address: '',
-      telephone: '',
-      schedule: ''
-    });
+    try {
+      // Preparar los datos para enviar al backend
+      const localData = {
+        name: formData.name,
+        address: formData.address,
+        telephone: parseInt(formData.telephone),
+        schedule: formData.schedule || '' // Si está vacío, enviar string vacío
+      };
+
+      if (isEditMode && editingLocal) {
+        // Actualizar local existente
+        await updateLocal(editingLocal, localData);
+        alert('Local actualizado exitosamente');
+        handleCancelEdit(); // Limpiar el formulario y salir del modo edición
+      } else {
+        // Crear nuevo local
+        await createLocal(localData);
+        alert('Local registrado exitosamente');
+        // Limpiar el formulario después de crear exitosamente
+        setFormData({
+          name: '',
+          address: '',
+          telephone: '',
+          schedule: ''
+        });
+      }
+    } catch (error) {
+      alert(`Error al ${isEditMode ? 'actualizar' : 'registrar'} el local: ` + error.message);
+    }
   };
 
-  const deleteLocal = (id) => {
-    setLocals(prev => prev.filter(local => local.id !== id));
+  const handleDeleteLocal = async (id) => {
+    if (window.confirm('¿Estás seguro de que deseas eliminar este local?')) {
+      try {
+        await deleteLocal(id);
+        
+        // Si estamos editando el local que se va a eliminar, cancelar la edición
+        if (editingLocal === id) {
+          handleCancelEdit();
+        }
+        
+        alert('Local eliminado exitosamente');
+      } catch (error) {
+        alert('Error al eliminar el local: ' + error.message);
+      }
+    }
   };
 
   const getRandomGradient = (index) => {
@@ -132,7 +198,7 @@ export default function AgregarLocal() {
       borderRadius: '24px',
       boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
       padding: '40px',
-      borderTop: '8px solid #667eea',
+      borderTop: isEditMode ? '8px solid #f59e0b' : '8px solid #667eea',
       position: 'sticky',
       top: '24px'
     },
@@ -178,20 +244,51 @@ export default function AgregarLocal() {
     },
     submitButton: {
       width: '100%',
-      background: 'linear-gradient(135deg, #667eea, #764ba2)',
+      background: loading ? '#9ca3af' : (isEditMode ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'linear-gradient(135deg, #667eea, #764ba2)'),
       color: 'white',
       padding: '18px 32px',
       borderRadius: '12px',
       fontWeight: '700',
       border: 'none',
-      cursor: 'pointer',
+      cursor: loading ? 'not-allowed' : 'pointer',
       fontSize: '18px',
       transition: 'transform 0.2s, box-shadow 0.2s',
-      boxShadow: '0 10px 15px -3px rgba(102, 126, 234, 0.4)',
+      boxShadow: isEditMode ? '0 10px 15px -3px rgba(245, 158, 11, 0.4)' : '0 10px 15px -3px rgba(102, 126, 234, 0.4)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '12px',
+      marginBottom: isEditMode ? '16px' : '0'
+    },
+    cancelButton: {
+      width: '100%',
+      background: 'linear-gradient(135deg, #6b7280, #4b5563)',
+      color: 'white',
+      padding: '14px 32px',
+      borderRadius: '12px',
+      fontWeight: '600',
+      border: 'none',
+      cursor: 'pointer',
+      fontSize: '16px',
+      transition: 'transform 0.2s, box-shadow 0.2s',
+      boxShadow: '0 8px 12px -3px rgba(107, 114, 128, 0.4)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       gap: '12px'
+    },
+    editModeIndicator: {
+      backgroundColor: '#fef3c7',
+      color: '#92400e',
+      padding: '12px 20px',
+      borderRadius: '12px',
+      marginBottom: '20px',
+      border: '1px solid #fcd34d',
+      fontSize: '14px',
+      fontWeight: '600',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px'
     },
     localsHeader: {
       display: 'flex',
@@ -231,7 +328,12 @@ export default function AgregarLocal() {
       padding: '0',
       overflow: 'hidden',
       transition: 'transform 0.3s, box-shadow 0.3s',
-      border: '1px solid rgba(0, 0, 0, 0.05)'
+      border: '1px solid rgba(0, 0, 0, 0.05)',
+      cursor: 'pointer'
+    },
+    editingCard: {
+      border: '3px solid #f59e0b',
+      boxShadow: '0 15px 30px -10px rgba(245, 158, 11, 0.3)'
     },
     localCardHeader: {
       height: '80px',
@@ -281,6 +383,23 @@ export default function AgregarLocal() {
       paddingTop: '20px',
       borderTop: '1px solid #e5e7eb'
     },
+    actionButtons: {
+      display: 'flex',
+      gap: '8px'
+    },
+    editButton: {
+      color: '#f59e0b',
+      backgroundColor: '#fffbeb',
+      border: '1px solid #fed7aa',
+      padding: '12px',
+      borderRadius: '12px',
+      cursor: 'pointer',
+      fontSize: '16px',
+      transition: 'all 0.2s',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px'
+    },
     deleteButton: {
       color: '#ef4444',
       backgroundColor: '#fef2f2',
@@ -316,6 +435,22 @@ export default function AgregarLocal() {
       fontSize: '0.8rem',
       color: '#9ca3af',
       fontStyle: 'italic'
+    },
+    errorMessage: {
+      backgroundColor: '#fef2f2',
+      color: '#dc2626',
+      padding: '12px',
+      borderRadius: '8px',
+      marginBottom: '20px',
+      border: '1px solid #fecaca'
+    },
+    loadingMessage: {
+      backgroundColor: '#f0f9ff',
+      color: '#0369a1',
+      padding: '12px',
+      borderRadius: '8px',
+      marginBottom: '20px',
+      border: '1px solid #bae6fd'
     }
   };
 
@@ -331,11 +466,37 @@ export default function AgregarLocal() {
           {/* Columna Izquierda */}
           <div style={styles.leftColumn}>
             {/* Formulario */}
-            <div style={styles.formCard}>
+            <div style={styles.formCard} id="form-section">
               <h2 style={styles.sectionTitle}>
-                <Plus style={{ marginRight: '12px', color: '#667eea' }} />
-                Registrar Local
+                {isEditMode ? (
+                  <Edit3 style={{ marginRight: '12px', color: '#f59e0b' }} />
+                ) : (
+                  <Plus style={{ marginRight: '12px', color: '#667eea' }} />
+                )}
+                {isEditMode ? 'Editar Local' : 'Registrar Local'}
               </h2>
+              
+              {/* Indicador de modo edición */}
+              {isEditMode && (
+                <div style={styles.editModeIndicator}>
+                  <Edit3 size={16} />
+                  Editando local - Los cambios se guardarán al hacer clic en "Actualizar Local"
+                </div>
+              )}
+              
+              {/* Mostrar errores si existen */}
+              {error && (
+                <div style={styles.errorMessage}>
+                  Error: {error}
+                </div>
+              )}
+              
+              {/* Mostrar estado de carga */}
+              {loading && (
+                <div style={styles.loadingMessage}>
+                  Procesando...
+                </div>
+              )}
               
               <div style={styles.inputGroup}>
                 <label style={styles.label}>Nombre del Local *</label>
@@ -348,7 +509,8 @@ export default function AgregarLocal() {
                   maxLength={100}
                   style={styles.input}
                   placeholder="Ej: Sucursal Centro"
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                  disabled={loading}
+                  onFocus={(e) => e.target.style.borderColor = isEditMode ? '#f59e0b' : '#667eea'}
                   onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                 />
               </div>
@@ -364,7 +526,8 @@ export default function AgregarLocal() {
                   maxLength={100}
                   style={styles.input}
                   placeholder="Ej: Av. Principal #123, Col. Centro"
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                  disabled={loading}
+                  onFocus={(e) => e.target.style.borderColor = isEditMode ? '#f59e0b' : '#667eea'}
                   onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                 />
               </div>
@@ -379,7 +542,8 @@ export default function AgregarLocal() {
                   required
                   style={styles.input}
                   placeholder="25551234"
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                  disabled={loading}
+                  onFocus={(e) => e.target.style.borderColor = isEditMode ? '#f59e0b' : '#667eea'}
                   onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                 />
               </div>
@@ -392,7 +556,8 @@ export default function AgregarLocal() {
                   onChange={handleInputChange}
                   style={styles.textarea}
                   placeholder="Ej: Lunes a Viernes: 8:00 AM - 6:00 PM&#10;Sábados: 8:00 AM - 2:00 PM&#10;Domingos: Cerrado"
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                  disabled={loading}
+                  onFocus={(e) => e.target.style.borderColor = isEditMode ? '#f59e0b' : '#667eea'}
                   onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                 />
               </div>
@@ -400,13 +565,29 @@ export default function AgregarLocal() {
               <button
                 type="button"
                 onClick={handleSubmit}
+                disabled={loading}
                 style={styles.submitButton}
-                onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
-                onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+                onMouseOver={(e) => !loading && (e.target.style.transform = 'translateY(-2px)')}
+                onMouseOut={(e) => !loading && (e.target.style.transform = 'translateY(0)')}
               >
-                <Store size={20} />
-                Registrar Local
+                {isEditMode ? <Save size={20} /> : <Store size={20} />}
+                {loading ? 'Guardando...' : (isEditMode ? 'Actualizar Local' : 'Registrar Local')}
               </button>
+
+              {/* Botón para cancelar edición */}
+              {isEditMode && (
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  disabled={loading}
+                  style={styles.cancelButton}
+                  onMouseOver={(e) => !loading && (e.target.style.transform = 'translateY(-2px)')}
+                  onMouseOut={(e) => !loading && (e.target.style.transform = 'translateY(0)')}
+                >
+                  <X size={18} />
+                  Cancelar Edición
+                </button>
+              )}
             </div>
           </div>
 
@@ -434,15 +615,23 @@ export default function AgregarLocal() {
               <div style={styles.localsGrid}>
                 {locals.map((local, index) => (
                   <div 
-                    key={local.id} 
-                    style={styles.localCard}
+                    key={local._id} 
+                    style={{
+                      ...styles.localCard,
+                      ...(editingLocal === local._id ? styles.editingCard : {})
+                    }}
+                    onClick={() => handleEditLocal(local)}
                     onMouseOver={(e) => {
                       e.currentTarget.style.transform = 'translateY(-8px)';
-                      e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.25)';
+                      e.currentTarget.style.boxShadow = editingLocal === local._id 
+                        ? '0 25px 50px -12px rgba(245, 158, 11, 0.4)' 
+                        : '0 25px 50px -12px rgba(0, 0, 0, 0.25)';
                     }}
                     onMouseOut={(e) => {
                       e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 15px 30px -10px rgba(0, 0, 0, 0.15)';
+                      e.currentTarget.style.boxShadow = editingLocal === local._id 
+                        ? '0 15px 30px -10px rgba(245, 158, 11, 0.3)' 
+                        : '0 15px 30px -10px rgba(0, 0, 0, 0.15)';
                     }}
                   >
                     <div style={{
@@ -450,12 +639,40 @@ export default function AgregarLocal() {
                       background: getRandomGradient(index)
                     }}>
                       <Store size={40} color="white" />
+                      {editingLocal === local._id && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '8px',
+                          right: '8px',
+                          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                          borderRadius: '50%',
+                          padding: '4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <Edit3 size={16} color="#f59e0b" />
+                        </div>
+                      )}
                     </div>
                     
                     <div style={styles.localCardBody}>
                       <h3 style={styles.localName}>
                         <Building size={20} color="#667eea" />
                         {local.name}
+                        {editingLocal === local._id && (
+                          <span style={{
+                            fontSize: '12px',
+                            backgroundColor: '#fef3c7',
+                            color: '#92400e',
+                            padding: '2px 8px',
+                            borderRadius: '12px',
+                            marginLeft: 'auto',
+                            fontWeight: 'normal'
+                          }}>
+                            Editando
+                          </span>
+                        )}
                       </h3>
                       
                       <div style={styles.localDetail}>
@@ -486,25 +703,60 @@ export default function AgregarLocal() {
                       
                       <div style={styles.localFooter}>
                         <span style={styles.createdDate}>
-                          Registrado el {local.createdAt}
+                          Registrado el {new Date(local.createdAt).toLocaleDateString()}
                         </span>
-                        <button
-                          onClick={() => deleteLocal(local.id)}
-                          style={styles.deleteButton}
-                          onMouseOver={(e) => {
-                            e.target.style.backgroundColor = '#fca5a5';
-                            e.target.style.color = '#ffffff';
-                            e.target.style.borderColor = '#f87171';
-                          }}
-                          onMouseOut={(e) => {
-                            e.target.style.backgroundColor = '#fef2f2';
-                            e.target.style.color = '#ef4444';
-                            e.target.style.borderColor = '#fecaca';
-                          }}
-                          title="Eliminar local"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        <div style={styles.actionButtons}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation(); // Evitar que se active el clic de la card
+                              handleEditLocal(local);
+                            }}
+                            style={styles.editButton}
+                            disabled={loading}
+                            onMouseOver={(e) => {
+                              if (!loading) {
+                                e.target.style.backgroundColor = '#fbbf24';
+                                e.target.style.color = '#ffffff';
+                                e.target.style.borderColor = '#f59e0b';
+                              }
+                            }}
+                            onMouseOut={(e) => {
+                              if (!loading) {
+                                e.target.style.backgroundColor = '#fffbeb';
+                                e.target.style.color = '#f59e0b';
+                                e.target.style.borderColor = '#fed7aa';
+                              }
+                            }}
+                            title="Editar local"
+                          >
+                            <Edit3 size={16} />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation(); // Evitar que se active el clic de la card
+                              handleDeleteLocal(local._id);
+                            }}
+                            style={styles.deleteButton}
+                            disabled={loading}
+                            onMouseOver={(e) => {
+                              if (!loading) {
+                                e.target.style.backgroundColor = '#fca5a5';
+                                e.target.style.color = '#ffffff';
+                                e.target.style.borderColor = '#f87171';
+                              }
+                            }}
+                            onMouseOut={(e) => {
+                              if (!loading) {
+                                e.target.style.backgroundColor = '#fef2f2';
+                                e.target.style.color = '#ef4444';
+                                e.target.style.borderColor = '#fecaca';
+                              }
+                            }}
+                            title="Eliminar local"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
