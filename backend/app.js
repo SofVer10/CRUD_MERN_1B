@@ -27,6 +27,8 @@ import swaggerUI from "swagger-ui-express";
 import fs from "fs";
 import path from "path";
 
+import limiter from "./src/middlewares/rateLimiter.js"
+
 
 //PASO 1 (Continuación)
 //Creo una constante que es igual
@@ -45,6 +47,11 @@ const swaggerDocument = JSON.parse(fs.readFileSync(
 app.use(express.json());
 //Que acepte cookies
 app.use(cookieParser());
+
+//PARA USAR EL LIMITE DE PERSONAS QUE PUEDEN ENTRAR AL SERVIDOR
+app.use(limiter)
+
+
 //PASO 5
 //Definir la ruta
 app.use("/api/products", productsRoutes);
